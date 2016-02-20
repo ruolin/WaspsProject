@@ -15,7 +15,7 @@ DE Analysis script using guide
 1. Use `git clone https://github.com/ruolin/WaspsProject/` to download or use the download link in the upper-right corner on the project page. 
 2. Unzip the input files in the folder HTSeq-Count-BFAST-raw-reads-count to your current dir.
 3. Before Running the R script, set the working dir to current dir by uncommenting and editing this line `# setwd("/path/to/your/current/dir")` in the code. 
-4. Install the dependant libraries in R
+4. Install the dependent libraries in R
   1. VennDiagram
   2. RColorBrewer
   3. edgeR
