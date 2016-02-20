@@ -12,6 +12,7 @@ We investigated the relationship between the primitively eusocial paper wasp, Po
 DE Analysis script using guide
 ==================
 
-1. Use `git clone https://github.com/ruolin/WaspsProject/` to download the input files and R script. 
-2. unzip the input file in the folder 
+1. Use `git clone https://github.com/ruolin/WaspsProject/` to download or use the download link in the upper-right corner on the project page. 
+2. Unzip the input files in the folder HTSeq-Count-BFAST-raw-reads-count
+3. Before Running the R script, change the working dir to your local dir 
 The R script also generates two excel spreadsheets, one for the condition-averaged raw reads counts for the 8484 expressed genes, the other for the edges R FDR values for each pairwise comparison.  
