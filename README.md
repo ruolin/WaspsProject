@@ -16,8 +16,9 @@ DE Analysis script using guide
 2. Unzip the input files in the folder HTSeq-Count-BFAST-raw-reads-count to your current dir.
 3. Before Running the R script, set the working dir to current dir by uncommenting and editing this line `# setwd("/path/to/your/current/dir")` in the code. 
 4. Install the dependant libraries in R
-   VennDiagram
-   RColorBrewer
-   EdgeR
+  1. VennDiagram
+  2. RColorBrewer
+  3. edgeR
+  4. xlsx
    
-The R script also generates two excel spreadsheets, one for the condition-averaged raw reads counts for the 8484 expressed genes, the other for the edges R FDR values for each pairwise comparison.  
+5. The R script also generates two excel spreadsheets, one for the condition-averaged raw reads counts for the 8484 expressed genes, the other for the edges R FDR values for each pairwise comparison.  
