@@ -73,23 +73,32 @@ SandG=topTags(wasps_et, n=90)
 #########
 ##### PCA 
 #########
-library(RColorBrewer)
-two_inter = intersect( rownames(NWandG), rownames(SandNW))
-three_inter = intersect(rownames(SandG), two_inter)
 
-wasps_table[three_inter,]
-pca= prcomp(wasps_table[three_inter,], scale.=T)$rotation
+library(RColorBrewer)
+mycol = brewer.pal(3,  name="Set1")
+#two_inter = intersect( rownames(NWandG), rownames(SandNW))
+#three_inter = intersect(rownames(SandG), two_inter)
+two_union = union( rownames(NWandG), rownames(SandNW))
+three_union = union(rownames(SandG), two_union)
+#wasps_table[three_inter,]
+#wasps_table[three_union,]
+#pca= prcomp(wasps_table[three_inter,], scale.=T)$rotation
+
+x = t(cpm.wasps_d[three_inter,])
+x = t(cpm.wasps_d[three_union,])
+
+pca= prcomp(x)
 col4 = as.factor(c("G","G","G","G","G","NW","NW","NW","NW","NW","S","S","S","S"))
-pca_wg = cbind(pca, col4)
+pca_wg = cbind(pca$x, col4)
 pca_wg
-plot(pca_wg[,1], pca_wg[,2], col=pca_wg[,4], pch=1)
-legend('topright', legend=c("Gynes, Normal workers, Stylopized workers"), col=1:3)
-warnings
+
+plot(pca_wg[,1], pca_wg[,2], col=mycol[pca_wg[,ncol(pca_wg)]], pch=pca_wg[,ncol(pca_wg)], xlab="PCA1", ylab="PCA2", cex=1.5)
+legend('center', legend=c("Gynes", "Normal workers", "Stylopized workers"), col=mycol, pch=c(1,2,3))
+
 #tab-delimited gene numbers
 #write.table(NWandG,file="SandNW.txt", quote=F, sep="\t")
 #write.table(SandG,file="SandG.txt", quote=F, sep="\t")
 #write.table(SandNW,file="SandNW.txt", quote=F, sep="\t")
-
 
 
 ##################
