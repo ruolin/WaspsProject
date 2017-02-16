@@ -1,9 +1,11 @@
+
+#Comment next two lines out to install the EdgeR
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("edgeR")
 library("edgeR")
 #citation("edgeR")
 
-# setwd("/path/to/your/current/dir")
+setwd("/home/ruolin/Research/WaspsProject/HTSeq-Count-BFAST-raw-reads-count")
 G1=read.table("BFAST-G1-r1.0.txt")
 G2=read.table("BFAST-G2-r1.0.txt")
 G3=read.table("BFAST-G3-r1.0.txt")
@@ -30,7 +32,7 @@ replicates=c(rep("gyne",5),rep("normal",5),rep("stylopized",4))
 rownames(wasps_table)=wasps_table[,1]
 wasps_table=wasps_table[,-1]
 wasps_table=wasps_table[1:11506,]
-
+sum(wasps_table[,1])
 #filter<-function(df, min_count){
   #df = df[apply(df[, -1], MARGIN = 1, function(x) all(x >= min_count)), ]
   #return (df)
@@ -40,12 +42,14 @@ wasps_table=wasps_table[1:11506,]
 ### Runint edge for DE genes
 wasps_d=DGEList(count=wasps_table,group=replicates)
 cpm.wasps_d <- cpm(wasps_d)
-cpm.wasps_d
-
+#cpm.wasps_d
+print(paste("number of transcripts before filtering", dim(wasps_table)[1]))
 ###Filtering gene with low read counts. 
 wasps_d <- wasps_d[ rowSums(cpm.wasps_d>3) >=3,]
 wasps_d <- calcNormFactors(wasps_d,)
 wasps_table=wasps_d$count
+print(paste("number of transcripts after filtering", dim(wasps_table)[1]))
+
 wasps_d <- estimateCommonDisp(wasps_d, verbose=TRUE)
 wasps_d <- estimateTagwiseDisp(wasps_d,verbose=TRUE)
 
@@ -64,6 +68,23 @@ wasps_et <- exactTest(wasps_d,pair=c(1,3))
 summary(decideTestsDGE(wasps_et, p.value=0.05))
 SandG=topTags(wasps_et, n=90)
 
+
+
+#########
+##### PCA 
+#########
+library(RColorBrewer)
+two_inter = intersect( rownames(NWandG), rownames(SandNW))
+three_inter = intersect(rownames(SandG), two_inter)
+
+wasps_table[three_inter,]
+pca= prcomp(wasps_table[three_inter,], scale.=T)$rotation
+col4 = as.factor(c("G","G","G","G","G","NW","NW","NW","NW","NW","S","S","S","S"))
+pca_wg = cbind(pca, col4)
+pca_wg
+plot(pca_wg[,1], pca_wg[,2], col=pca_wg[,4], pch=1)
+legend('topright', legend=c("Gynes, Normal workers, Stylopized workers"), col=1:3)
+warnings
 #tab-delimited gene numbers
 #write.table(NWandG,file="SandNW.txt", quote=F, sep="\t")
 #write.table(SandG,file="SandG.txt", quote=F, sep="\t")
