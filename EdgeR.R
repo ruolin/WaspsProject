@@ -1,9 +1,11 @@
+
+#Comment next two lines out to install the EdgeR
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("edgeR")
 library("edgeR")
 #citation("edgeR")
 
-# setwd("/path/to/your/current/dir")
+setwd("/home/ruolin/Research/WaspsProject/HTSeq-Count-BFAST-raw-reads-count")
 G1=read.table("BFAST-G1-r1.0.txt")
 G2=read.table("BFAST-G2-r1.0.txt")
 G3=read.table("BFAST-G3-r1.0.txt")
@@ -30,22 +32,24 @@ replicates=c(rep("gyne",5),rep("normal",5),rep("stylopized",4))
 rownames(wasps_table)=wasps_table[,1]
 wasps_table=wasps_table[,-1]
 wasps_table=wasps_table[1:11506,]
-
+sum(wasps_table[,1])
 #filter<-function(df, min_count){
-  #df = df[apply(df[, -1], MARGIN = 1, function(x) all(x >= min_count)), ]
-  #return (df)
+#df = df[apply(df[, -1], MARGIN = 1, function(x) all(x >= min_count)), ]
+#return (df)
 #}
 
 #wasps_table=filter(wasps_table, 1)
 ### Runint edge for DE genes
 wasps_d=DGEList(count=wasps_table,group=replicates)
 cpm.wasps_d <- cpm(wasps_d)
-cpm.wasps_d
-
+#cpm.wasps_d
+print(paste("number of transcripts before filtering", dim(wasps_table)[1]))
 ###Filtering gene with low read counts. 
 wasps_d <- wasps_d[ rowSums(cpm.wasps_d>3) >=3,]
 wasps_d <- calcNormFactors(wasps_d,)
 wasps_table=wasps_d$count
+print(paste("number of transcripts after filtering", dim(wasps_table)[1]))
+
 wasps_d <- estimateCommonDisp(wasps_d, verbose=TRUE)
 wasps_d <- estimateTagwiseDisp(wasps_d,verbose=TRUE)
 
@@ -64,12 +68,34 @@ wasps_et <- exactTest(wasps_d,pair=c(1,3))
 summary(decideTestsDGE(wasps_et, p.value=0.05))
 SandG=topTags(wasps_et, n=90)
 
+
+
+#########
+##### PCA 
+#########
+
+library(RColorBrewer)
+mycol = brewer.pal(3,  name="Set1")
+#two_inter = intersect( rownames(NWandG), rownames(SandNW))
+#three_inter = intersect(rownames(SandG), two_inter)
+two_union = union( rownames(NWandG), rownames(SandNW))
+three_union = union(rownames(SandG), two_union)
+#wasps_table[three_inter,]
+#wasps_table[three_union,]
+#pca= prcomp(wasps_table[three_inter,], scale.=T)$rotation
+
+x = t(cpm.wasps_d[three_inter,])
+x = t(cpm.wasps_d[three_union,])
+
+pca= prcomp(x)
+group = as.numeric(as.factor(c("G","G","G","G","G","NW","NW","NW","NW","NW","S","S","S","S")))
+plot(pca$x[,1], pca$x[,2], col=mycol[group], pch=group, xlab="PCA1", ylab="PCA2", cex=1.5, 
+     main="Principal component analysis (PCA) of the 367 different exressed gene data set")
+legend('center', legend=c("Gyne", "Worker", "Stylopized"), col=mycol, pch=c(1,2,3))
 #tab-delimited gene numbers
 #write.table(NWandG,file="SandNW.txt", quote=F, sep="\t")
 #write.table(SandG,file="SandG.txt", quote=F, sep="\t")
 #write.table(SandNW,file="SandNW.txt", quote=F, sep="\t")
-
-
 
 ##################
 ### Venn Diagram############
@@ -172,5 +198,4 @@ overall.table=rbind(overall.table,SandNW.nonoverlap)
 library(xlsx)
 write.xlsx(overall.table,file="overall_DEG_list_addFDR.xlsx")
 write.xlsx(t_agg,file="expressed_gene_lists.xlsx")
-
 
